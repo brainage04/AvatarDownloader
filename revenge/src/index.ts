@@ -18,8 +18,9 @@ interface ProfileAvatarProps {
 }
 
 interface MediaManager {
-    // The second argument is 1 for a GIF and 0 for a still image. On Discord 346.13 the promise resolves to
-    // undefined whether or not a file was saved (checked with a 404 URL), so download() checks the URL itself.
+    // The second argument is 1 for a GIF and 0 for a still image. On Discord 346.13 a 404 URL saves nothing, yet
+    // the promise resolves to undefined and Discord shows its "Image Saved" toast just as after a real save, so
+    // download() checks the URL itself first.
     downloadMediaAsset(url: string, kind: 0 | 1): Promise<unknown>;
 }
 
@@ -29,7 +30,6 @@ async function download({ url, filename }: AvatarDownload, mediaManager: MediaMa
     try {
         const response = await fetch(url, { method: "HEAD" });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        showToast("Saving the avatar to Downloads");
         await mediaManager.downloadMediaAsset(url, filename.endsWith(".gif") ? 1 : 0);
     } catch (error) {
         showToast(`Could not save the avatar: ${error instanceof Error ? error.message : String(error)}`);
