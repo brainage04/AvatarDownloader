@@ -4,18 +4,17 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { findByName, findByProps, findByStoreName } from "@vendetta/metro";
-import { React, ReactNative as RN } from "@vendetta/metro/common";
+import { findByProps, findByStoreName } from "@vendetta/metro";
+import { React } from "@vendetta/metro/common";
 import { after } from "@vendetta/patcher";
 import { showConfirmationAlert } from "@vendetta/ui/alerts";
 import { showToast } from "@vendetta/ui/toasts";
 
 import { type AvatarDownload, type AvatarUser, serverAvatar, userAvatar } from "../../common/avatar";
 
-interface HeaderAvatarProps {
+interface ProfileAvatarProps {
     user?: AvatarUser;
     guildId?: string;
-    style?: unknown;
 }
 
 interface MediaManager {
@@ -35,16 +34,16 @@ async function download({ url, filename }: AvatarDownload, mediaManager: MediaMa
 }
 
 function onLoad() {
-    // HeaderAvatar is the large avatar on a user's profile sheet.
-    const headerAvatar = findByName("HeaderAvatar", false);
+    // The large avatar on a user's profile sheet; its inner component already opens Discord's viewer on tap.
+    const profileAvatar = findByProps("OpenableUserProfileAvatar");
     const mediaManager = findByProps("downloadMediaAsset") as MediaManager | undefined;
     const guildMemberStore = findByStoreName("GuildMemberStore");
-    if (!headerAvatar || !mediaManager) {
+    if (!profileAvatar || !mediaManager) {
         showToast("AvatarDownloader could not find Discord's profile avatar or media saver");
         return;
     }
 
-    unpatch = after("default", headerAvatar, ([{ user, guildId, style }]: [HeaderAvatarProps], rendered) => {
+    unpatch = after("OpenableUserProfileAvatar", profileAvatar, ([{ user, guildId }]: [ProfileAvatarProps], rendered) => {
         if (!user?.id || !rendered) return rendered;
 
         const openDialog = () => {
@@ -64,11 +63,7 @@ function onLoad() {
             });
         };
 
-        return (
-            <RN.Pressable onLongPress={openDialog} style={style}>
-                {React.cloneElement(rendered, { style: undefined })}
-            </RN.Pressable>
-        );
+        return React.cloneElement(rendered, { onLongPress: openDialog });
     });
 }
 
