@@ -10,7 +10,7 @@ import { setImmediate } from "node:timers/promises";
 
 import { createNotifier, type Notice } from "./notify";
 
-/** What Vencord 1.15.16's showToast throws once its lookup has found no module. */
+/** What Vencord's showToast threw once its lookup had found no module (seen on 1.15.16). */
 function brokenToast(): never {
     throw new TypeError("Function.prototype.apply was called on null, which is an object and not a function");
 }
@@ -38,9 +38,9 @@ test("a working toast shows the notice and nothing else", () => {
     const calls = recorder();
     const notify = createNotifier(calls.options);
 
-    notify({ text: "Copied 3 raw messages", variant: "success" });
+    notify({ text: "Could not download the avatar: HTTP 404", variant: "critical" });
 
-    assert.deepEqual(calls.toasts, [{ text: "Copied 3 raw messages", variant: "success" }]);
+    assert.deepEqual(calls.toasts, [{ text: "Could not download the avatar: HTTP 404", variant: "critical" }]);
     assert.deepEqual(calls.fallbacks, []);
     assert.deepEqual(calls.logs, []);
 });
@@ -49,9 +49,9 @@ test("a throwing toast does not throw and shows the notice through the fallback"
     const calls = recorder();
     const notify = createNotifier({ ...calls.options, toast: brokenToast });
 
-    assert.doesNotThrow(() => notify({ text: "Fetching the selected conversation range…" }));
+    assert.doesNotThrow(() => notify({ text: "Could not download the avatar: Failed to fetch" }));
 
-    assert.deepEqual(calls.fallbacks, [{ text: "Fetching the selected conversation range…" }]);
+    assert.deepEqual(calls.fallbacks, [{ text: "Could not download the avatar: Failed to fetch" }]);
     assert.deepEqual(calls.logs, ["Toasts are broken, showing notifications instead"]);
 });
 
@@ -77,18 +77,18 @@ test("after one failed toast later notices go straight to the fallback", () => {
 test("a fallback that throws or rejects is logged, not thrown", async () => {
     const throwing = recorder(() => { throw new Error("no root"); });
     const notifyThrowing = createNotifier({ ...throwing.options, toast: brokenToast });
-    assert.doesNotThrow(() => notifyThrowing({ text: "Conversation range cleared" }));
+    assert.doesNotThrow(() => notifyThrowing({ text: "Could not download the avatar: HTTP 500" }));
     assert.deepEqual(throwing.logs, [
         "Toasts are broken, showing notifications instead",
-        "Could not show \"Conversation range cleared\""
+        "Could not show \"Could not download the avatar: HTTP 500\""
     ]);
 
     const rejecting = recorder(() => Promise.reject(new Error("no root")));
     const notifyRejecting = createNotifier({ ...rejecting.options, toast: brokenToast });
-    notifyRejecting({ text: "Conversation range cleared" });
+    notifyRejecting({ text: "Could not download the avatar: HTTP 500" });
     await setImmediate();
     assert.deepEqual(rejecting.logs, [
         "Toasts are broken, showing notifications instead",
-        "Could not show \"Conversation range cleared\""
+        "Could not show \"Could not download the avatar: HTTP 500\""
     ]);
 });

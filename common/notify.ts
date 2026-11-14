@@ -10,7 +10,7 @@ export interface Notice {
 }
 
 export interface NotifierOptions {
-    /** Shows a toast through the client. May throw: Vencord 1.15.16 cannot find Discord's toast module. */
+    /** Shows a toast through the client. May throw when Vencord's lazy lookup finds no toast module (seen on 1.15.16). */
     toast(notice: Notice): void;
     /** Shown instead once the toast has failed. May throw or reject. */
     fallback(notice: Notice): void | Promise<void>;
