@@ -22,7 +22,7 @@ Where the user has a server avatar in the current server, both clients also offe
   node src/cli.mjs vencord install --plugins AvatarDownloader --enable --restart
   ```
 
-  Or copy `index.ts`, `common/` and `vencord/` into Vencord's `src/userplugins/avatarDownloader.vesktop/` and build Vencord yourself; the page has the steps.
+  Or copy `index.ts`, `common/` and `vencord/` into Vencord's `src/userplugins/avatarDownloader.vesktop/` and build Vencord yourself. The page has the steps.
 
 ## Build and test
 
@@ -32,7 +32,7 @@ npm test        # tests for the shared avatar URLs in common/
 npm run build   # Revenge build: dist/manifest.json and dist/index.js
 ```
 
-`common/` builds the avatar URLs and file names both clients use, `revenge/` holds the Revenge plugin and its manifest, and `index.ts` with `vencord/` is the Vencord userplugin. `site/` is the GitHub Pages site, which also serves the Revenge build; see [site/README.md](site/README.md).
+`common/` builds the avatar URLs and file names both clients use, `revenge/` holds the Revenge plugin and its manifest, and `index.ts` with `vencord/` is the Vencord userplugin. `site/` is the GitHub Pages site, which also serves the Revenge build (details in [site/README.md](site/README.md)).
 
 ## Licence
 

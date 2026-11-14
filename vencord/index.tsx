@@ -35,6 +35,7 @@ const userContextMenuPatch: NavContextMenuPatchCallback = (children, { user, gui
                 id="avatar-downloader-avatar"
                 label="Download Avatar"
                 icon={CloudDownloadIcon}
+                leadingAccessory={{ type: "icon", icon: CloudDownloadIcon }}
                 action={() => void download(userAvatar(user))}
             />
             {guildId && memberAvatar && (
@@ -42,6 +43,7 @@ const userContextMenuPatch: NavContextMenuPatchCallback = (children, { user, gui
                     id="avatar-downloader-server-avatar"
                     label="Download Server Avatar"
                     icon={CloudDownloadIcon}
+                    leadingAccessory={{ type: "icon", icon: CloudDownloadIcon }}
                     action={() => void download(serverAvatar(user, guildId, memberAvatar))}
                 />
             )}

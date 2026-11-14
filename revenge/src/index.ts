@@ -18,8 +18,8 @@ interface ProfileAvatarProps {
 }
 
 interface MediaManager {
-    // The second argument is 1 for a GIF and 0 for a still image. On Discord 346.13 the promise resolves to a
-    // falsy value even after a successful save, so only a rejection means it failed.
+    // The second argument is 1 for a GIF and 0 for a still image. On Discord 346.13 the promise resolves to
+    // undefined whether or not a file was saved (checked with a 404 URL), so download() checks the URL itself.
     downloadMediaAsset(url: string, kind: 0 | 1): Promise<unknown>;
 }
 
@@ -27,15 +27,17 @@ let unpatch: (() => void) | undefined;
 
 async function download({ url, filename }: AvatarDownload, mediaManager: MediaManager) {
     try {
+        const response = await fetch(url, { method: "HEAD" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        showToast("Saving the avatar to Downloads");
         await mediaManager.downloadMediaAsset(url, filename.endsWith(".gif") ? 1 : 0);
-        showToast("Avatar saved to Downloads");
     } catch (error) {
         showToast(`Could not save the avatar: ${error instanceof Error ? error.message : String(error)}`);
     }
 }
 
 function onLoad() {
-    // The large avatar on a user's profile sheet; its inner component already opens Discord's viewer on tap.
+    // The large avatar on a user's profile sheet. Tapping it already opens Discord's viewer.
     const profileAvatar = findByProps("OpenableUserProfileAvatar");
     const mediaManager = findByProps("downloadMediaAsset") as MediaManager | undefined;
     const guildMemberStore = findByStoreName("GuildMemberStore");
