@@ -1,0 +1,22 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    uses: brainage04/AstroShell/.github/workflows/package-test.yml@e07fdc652eae9ed49f0d77b20f6c2326ec4169c0 # v0.5.2
+    permissions:
+      contents: read
+
+  deploy:
+    needs: test
+    uses: brainage04/AstroShell/.github/workflows/site-deploy.yml@e07fdc652eae9ed49f0d77b20f6c2326ec4169c0 # v0.5.2
+    with:
+      path: site
+    permissions:
+      contents: read
+      pages: write
+      id-token: write

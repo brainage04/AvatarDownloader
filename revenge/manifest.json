@@ -1,0 +1,14 @@
+{
+  "name": "AvatarDownloader",
+  "description": "Download a user's profile picture: right-click them on Vesktop, or long-press the avatar on their profile on Revenge.",
+  "authors": [
+    {
+      "name": "brainage04",
+      "id": "0"
+    }
+  ],
+  "main": "src/index.tsx",
+  "vendetta": {
+    "icon": "DownloadIcon"
+  }
+}
