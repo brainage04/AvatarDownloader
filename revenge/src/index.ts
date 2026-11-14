@@ -18,16 +18,17 @@ interface ProfileAvatarProps {
 }
 
 interface MediaManager {
-    // The second argument is 1 for a GIF and 0 for a still image; the promise reports whether it was saved.
-    downloadMediaAsset(url: string, kind: 0 | 1): Promise<boolean>;
+    // The second argument is 1 for a GIF and 0 for a still image. On Discord 346.13 the promise resolves to a
+    // falsy value even after a successful save, so only a rejection means it failed.
+    downloadMediaAsset(url: string, kind: 0 | 1): Promise<unknown>;
 }
 
 let unpatch: (() => void) | undefined;
 
 async function download({ url, filename }: AvatarDownload, mediaManager: MediaManager) {
     try {
-        const saved = await mediaManager.downloadMediaAsset(url, filename.endsWith(".gif") ? 1 : 0);
-        showToast(saved ? "Avatar saved" : "Could not save the avatar");
+        await mediaManager.downloadMediaAsset(url, filename.endsWith(".gif") ? 1 : 0);
+        showToast("Avatar saved to Downloads");
     } catch (error) {
         showToast(`Could not save the avatar: ${error instanceof Error ? error.message : String(error)}`);
     }
