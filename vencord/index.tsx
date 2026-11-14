@@ -5,13 +5,27 @@
  */
 
 import { NavContextMenuPatchCallback } from "@api/ContextMenu";
+import { showNotification } from "@api/Notifications";
 import { CloudDownloadIcon } from "@components/Icons";
+import { Logger } from "@utils/Logger";
 import type { PluginDef } from "@utils/types";
 import { saveFile } from "@utils/web";
 import type { User } from "@vencord/discord-types";
 import { GuildMemberStore, Menu, showToast } from "@webpack/common";
 
 import { type AvatarDownload, serverAvatar, userAvatar } from "../common/avatar";
+import { createNotifier } from "../common/notify";
+
+const logger = new Logger("AvatarDownloader");
+const notify = createNotifier({
+    toast: showToast,
+    fallback: ({ text, variant }) => showNotification({
+        title: "Avatar Downloader",
+        body: text,
+        color: variant === "critical" ? "var(--red-360)" : variant === "success" ? "var(--green-360)" : undefined
+    }),
+    log: (message, error) => logger.error(message, error)
+});
 
 async function download({ url, filename }: AvatarDownload) {
     try {
@@ -21,7 +35,7 @@ async function download({ url, filename }: AvatarDownload) {
         saveFile(new File([image], filename, { type: image.type }));
     } catch (error) {
         const reason = error instanceof Error ? error.message : String(error);
-        showToast({ text: `Could not download the avatar: ${reason}`, variant: "critical" });
+        notify({ text: `Could not download the avatar: ${reason}`, variant: "critical" });
     }
 }
 
